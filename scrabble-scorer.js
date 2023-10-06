@@ -33,25 +33,92 @@ function oldScrabbleScorer(word) {
 // don't change the names or your program won't work as expected. //
 
 function initialPrompt() {
-   console.log("Let's play some scrabble! Enter a word:");
+   console.log("Let's play some scrabble!");
+   let word = input.question("Enter a word to score: ");
+   let score = oldScrabbleScorer(word);
+   console.log(score);
+   return score;
 };
 
-let simpleScorer;
+function simpleScorer(word) {
+   word = word.toUpperCase();
+   let score = word.length;
+   return score;
+}
 
-let vowelBonusScorer;
+function vowelBonusScorer(word) {
+   word = word.toUpperCase();
+   const vowels = ['A', 'E', 'I', 'O', 'U'];
+   let score = 0;
 
-let scrabbleScorer;
+   for (let i = 0; i < word.length; i++) {
+      if (vowels.includes(word[i])) {
+         score+= 3;
+      } else {
+         score += 1;
+      }
+   }
+   return score;
+}
 
-const scoringAlgorithms = [];
+function scrabbleScorer(word) {
+   word = word.toLowerCase();
+      let score = 0;
 
-function scorerPrompt() {}
+      for (let letter of word) {
+         score += newPointStructure[letter] || 0;
+      }
+   return score;
+}
 
-function transform() {};
+const scoringAlgorithms = [
+   {
+      name: "Simple Scorer",
+      description: "Single point Letter",
+      scorerFunction: simpleScorer
+   },
+   {
+      name: "Vowel Bonus Scorer",
+      description: "Tripple Point Vowels",
+      scorerFunction: vowelBonusScorer
+   },
+   {
+      name: "Scrabble Scorer",
+      description: "Original Rules",
+      scorerFunction: oldScrabbleScorer
+   },
+];
 
-let newPointStructure;
+function scorerPrompt() {
+   console.log("Which scoring system would you like to use?");
+
+   for (let i = 0; i < scoringAlgorithms.length; i++) {
+      console.log(`${i}. ${scoringAlgorithms[i].name}`);
+   }
+
+   let selection = input.question("Enter 0, 1, or 2: ");
+   return scoringAlgorithms[selection].scorerFunction;
+}
+
+function transform(oldPointStructure) {
+   let newPointStructure = {};
+
+   for (let pointValue in oldPointStructure) {
+      for (let letter of oldPointStructure[pointValue]) {
+         newPointStructure[letter.toLowerCase()] = parseInt(pointValue);
+      }
+   }
+   return newPointStructure;
+}
+let newPointStructure = transform(oldPointStructure);
 
 function runProgram() {
    initialPrompt();
+   let word = input.question("Enter a word to score: ");
+   let scoringFunction = scorerPrompt();
+   let score = scoringFunction(word);
+   console.log(`Score for '${word}': ${score}`);
+   return score;
    
 }
 
